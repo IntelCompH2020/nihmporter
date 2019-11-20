@@ -1,0 +1,38 @@
+input:
+
+  NIH:
+
+    homepage: "https://exporter.nih.gov"
+
+    projects:
+
+      # the URL (relative to the above "homepage") where to find projects data
+      relative path: "ExPORTER_Catalog.aspx?sid=1&index=0"
+
+      # the position of the table of interest when considering all the tables in the URL
+      table number: &nih_projects_table_number 12
+
+      # the column within the table containing the links to the files that must be downloaded
+      links column: &nih_projects_links_column CSV_link
+
+      # the column within the table containing the sizes of the files that must be downloaded
+      sizes column: &nih_projects_sizes_column CSV
+
+    publications:
+
+      # the URL (relative to the above "homepage") where to find projects data
+      relative path: "ExPORTER_Catalog.aspx?sid=0&index=2"
+
+      # the position of the table of interest when considering all the tables in the URL
+      table number: *nih_projects_table_number
+
+      # the column within the table containing the links to the files that must be downloaded
+      links column: *nih_projects_links_column
+
+      # the column within the table containing the sizes of the files that must be downloaded
+      sizes column: *nih_projects_sizes_column
+
+output:
+
+      # relative to the directory where the script is run
+      downloads directory: downloads
