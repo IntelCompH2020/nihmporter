@@ -1,5 +1,6 @@
 import pathlib
 import requests
+import zipfile
 import urllib.parse
 from typing import Union, Optional, Collection, List
 
@@ -28,7 +29,7 @@ def file(url: str, output_file: Union[str, pathlib.Path]) -> None:
 
 def files_list(
 		files_relative_paths: Collection[str], downloads_directory: Union[str, pathlib.Path], homepage: str,
-		sizes: Optional[Collection[str]] = None) -> List[pathlib.Path]:
+		sizes: Optional[Collection[str]] = None, unzip_to: Optional[str] = None) -> List[pathlib.Path]:
 	"""
 	Downloads the URLs.
 
@@ -42,6 +43,8 @@ def files_list(
 		Base URL with respect to which the `relative_paths` are specified.
 	sizes: iterable over str, optional
 		Sizes of the files.
+	unzip_to: str, optional
+		The directory to which the downloaded files should be unzipped.
 
 	Returns
 	-------
@@ -69,13 +72,19 @@ def files_list(
 	# a list with the files downloaded
 	downloaded_files = []
 
-	for file, size in zip(files_relative_paths, sizes):
+	for f, size in zip(files_relative_paths, sizes):
 
-		output_file = output_dir / pathlib.Path(file).name
+		output_file = output_dir / pathlib.Path(f).name
 
 		print(f'downloading "{output_file.relative_to(current_dir)}" {size}')
 
-		# file(urllib.parse.urljoin(homepage, file), output_file)
+		# file(urllib.parse.urljoin(homepage, f), output_file)
+
+		if unzip_to is not None:
+
+			with zipfile.ZipFile(output_file) as downloaded_zip:
+
+				downloaded_zip.extractall(path=output_dir / unzip_to)
 
 		# the output file path is added to the list of downloaded files
 		downloaded_files.append(output_file)

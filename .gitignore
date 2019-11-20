@@ -1,2 +1,6 @@
 changelog
-*.zip
+/* *.zip */
+/* *.csv */
+downloads
+*.feather
+__pycache__
