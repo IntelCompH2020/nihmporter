@@ -2,7 +2,7 @@ import pathlib
 import requests
 import zipfile
 import urllib.parse
-from typing import Union, Optional, Collection, List
+from typing import Union, Optional, Collection, List, Tuple
 
 current_dir = pathlib.Path.cwd()
 
@@ -29,7 +29,8 @@ def file(url: str, output_file: Union[str, pathlib.Path]) -> None:
 
 def files_list(
 		files_relative_paths: Collection[str], downloads_directory: Union[str, pathlib.Path], homepage: str,
-		sizes: Optional[Collection[str]] = None, unzip_to: Optional[str] = None) -> List[pathlib.Path]:
+		sizes: Optional[Collection[str]] = None,
+		unzip_to: Optional[str] = None) -> Union[Tuple[List[pathlib.Path], List[pathlib.Path]], List[pathlib.Path]]:
 	"""
 	Downloads the URLs.
 
@@ -50,6 +51,8 @@ def files_list(
 	-------
 	downloaded_files: list of pathlib.Path
 		The paths of the downloaded files.
+	unzipped_files: list of pathlib.Path
+		The paths of the uncompressed files if `unzip_to` was passed.
 
 	"""
 
@@ -72,21 +75,44 @@ def files_list(
 	# a list with the files downloaded
 	downloaded_files = []
 
+	# if a directory to unzip the files to was passed...
+	if unzip_to is not None:
+
+		# ...the list of uncompressed files is initialized
+		unzipped_files = []
+
 	for f, size in zip(files_relative_paths, sizes):
 
 		output_file = output_dir / pathlib.Path(f).name
 
-		print(f'downloading "{output_file.relative_to(current_dir)}" {size}')
+		# if the file has not been previously downloaded...
+		if not output_file.exists():
 
-		# file(urllib.parse.urljoin(homepage, f), output_file)
+			print(f'downloading "{output_file.relative_to(current_dir)}" {size}')
 
+			# ...it is now
+			file(urllib.parse.urljoin(homepage, f), output_file)
+
+		else:
+
+			print(f'found "{output_file.relative_to(current_dir)}" {size}')
+
+		# if a directory to unzip the files to was passed...
 		if unzip_to is not None:
 
 			with zipfile.ZipFile(output_file) as downloaded_zip:
 
-				downloaded_zip.extractall(path=output_dir / unzip_to)
+				downloaded_zip.extractall(path=unzip_to)
+
+				unzipped_files.extend([unzip_to / f for f in downloaded_zip.namelist()])
 
 		# the output file path is added to the list of downloaded files
 		downloaded_files.append(output_file)
 
-	return downloaded_files
+	if unzip_to:
+
+		return downloaded_files, unzipped_files
+
+	else:
+
+		return downloaded_files
