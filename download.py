@@ -85,6 +85,8 @@ def files_list(
 
 		output_file = output_dir / pathlib.Path(f).name
 
+		file_was_downloaded = False
+
 		# if the file has not been previously downloaded...
 		if not output_file.exists():
 
@@ -92,6 +94,8 @@ def files_list(
 
 			# ...it is now
 			file(urllib.parse.urljoin(homepage, f), output_file)
+
+			file_was_downloaded = True
 
 		else:
 
@@ -102,7 +106,11 @@ def files_list(
 
 			with zipfile.ZipFile(output_file) as downloaded_zip:
 
-				downloaded_zip.extractall(path=unzip_to)
+				# only if the zip file was downloaded...
+				if file_was_downloaded:
+
+					# ...it is decompressed
+					downloaded_zip.extractall(path=unzip_to)
 
 				unzipped_files.extend([unzip_to / f for f in downloaded_zip.namelist()])
 
