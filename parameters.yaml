@@ -40,6 +40,7 @@ output:
 
         feather file: projects.feather
 
+# data tables specifications (you probably don't want to mess with this)
 data:
 
   projects:
@@ -92,3 +93,7 @@ data:
       SUPPORT_YEAR: object
       TOTAL_COST: float64
       TOTAL_COST_SUB_PROJECT: float64
+
+  publications:
+
+    data types:

@@ -9,7 +9,7 @@ current_dir = pathlib.Path.cwd()
 
 def file(url: str, output_file: Union[str, pathlib.Path]) -> None:
 	"""
-	Download a file from an URL
+	Download a file from a URL.
 
 	Parameters
 	----------
@@ -20,10 +20,13 @@ def file(url: str, output_file: Union[str, pathlib.Path]) -> None:
 
 	"""
 
+	# URL is requested
 	read_url = requests.get(url)
 
+	# the output file is open for writing...
 	with open(output_file, 'wb') as f:
 
+		# ...and the content of the URL written
 		f.write(read_url.content)
 
 
@@ -52,7 +55,7 @@ def files_list(
 	downloaded_files: list of pathlib.Path
 		The paths of the downloaded files.
 	unzipped_files: list of pathlib.Path
-		The paths of the uncompressed files if `unzip_to` was passed.
+		The paths of the uncompressed files *if* `unzip_to` was passed.
 
 	"""
 
@@ -68,19 +71,22 @@ def files_list(
 		# ...a generator of empty strings is used instead
 		sizes = ("" for _ in range(len(files_relative_paths)))
 
+	# the output directory is obtained from the current one and the passed `downloads_directory`
 	output_dir = current_dir / downloads_directory
 
+	# it is created
 	output_dir.mkdir(parents=True, exist_ok=True)
 
-	# a list with the files downloaded
+	# a list for the downloaded files
 	downloaded_files = []
 
 	# if a directory to unzip the files to was passed...
 	if unzip_to is not None:
 
-		# ...the list of uncompressed files is initialized
+		# ...a list for uncompressed files is initialized
 		unzipped_files = []
 
+	# for every file along with its size...
 	for f, size in zip(files_relative_paths, sizes):
 
 		output_file = output_dir / pathlib.Path(f).name
@@ -117,10 +123,14 @@ def files_list(
 		# the output file path is added to the list of downloaded files
 		downloaded_files.append(output_file)
 
-	if unzip_to:
+	# if a directory to unzip the files to was passed...
+	if unzip_to is not None:
 
+		# ...uncompressed files are also returned
 		return downloaded_files, unzipped_files
 
+	# if a directory to unzip the files to was NOT passed...
 	else:
 
+		# ...only downloaded files are returned
 		return downloaded_files
