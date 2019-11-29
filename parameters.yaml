@@ -1,99 +1,100 @@
-input:
+homepage: "https://exporter.nih.gov"
 
-  NIH:
+projects:
 
-    homepage: "https://exporter.nih.gov"
+  # to be used when saving
+  name: projects
 
-    projects:
+  # the URL (relative to the above "homepage") where to find projects data
+  relative path: "ExPORTER_Catalog.aspx?sid=1&index=0"
 
-      # the URL (relative to the above "homepage") where to find projects data
-      relative path: "ExPORTER_Catalog.aspx?sid=1&index=0"
+  # the position of the table of interest when considering all the tables in the URL
+  table number: &nih_projects_table_number 12
 
-      # the position of the table of interest when considering all the tables in the URL
-      table number: &nih_projects_table_number 12
+  # the name of the (feather) file in/from which the data will be saved/loaded
+  feather file: projects.feather
 
-    publications:
+  # (Python) regular expressions for (linked) files to be ignored
+  filename patterns to be ignored:
+    - ^javascript.*
+    - .*_DUNS_.*\.zip$
+    - .*_PRJFUNDING_.*\.zip$
 
-      # the URL (relative to the above "homepage") where to find publications data
-      relative path: "ExPORTER_Catalog.aspx?sid=0&index=2"
+  # data types specification (you probably don't want to mess with this)
+  data types:
 
-      # the position of the table of interest when considering all the tables in the URL
-      table number: *nih_projects_table_number
+    ACTIVITY: object
+    ADMINISTERING_IC: object
+    APPLICATION_ID: int64
+    APPLICATION_TYPE: float64
+    ARRA_FUNDED: object
+    AWARD_NOTICE_DATE: object
+    BUDGET_END: object
+    BUDGET_START: object
+    CFDA_CODE: object
+    CORE_PROJECT_NUM: object
+    DIRECT_COST_AMT: float64
+    ED_INST_TYPE: object
+    FOA_NUMBER: object
+    FULL_PROJECT_NUM: object
+    FUNDING_ICs: object
+    FUNDING_MECHANISM: object
+    FY: int64
+    IC_NAME: object
+    INDIRECT_COST_AMT: float64
+    NIH_SPENDING_CATS: object
+    ORG_CITY: object
+    ORG_COUNTRY: object
+    ORG_DEPT: object
+    ORG_DISTRICT: float64
+    ORG_DUNS: object
+    ORG_FIPS: object
+    ORG_IPF_CODE: float64
+    ORG_NAME: object
+    ORG_STATE: object
+    ORG_ZIPCODE: object
+    PHR: object
+    PI_IDS: object
+    PI_NAMEs: object
+    PROGRAM_OFFICER_NAME: object
+    PROJECT_END: object
+    PROJECT_START: object
+    PROJECT_TERMS: object
+    PROJECT_TITLE: object
+    SERIAL_NUMBER: object
+    STUDY_SECTION: object
+    STUDY_SECTION_NAME: object
+    SUBPROJECT_ID: float64
+    SUFFIX: object
+    SUPPORT_YEAR: object
+    TOTAL_COST: float64
+    TOTAL_COST_SUB_PROJECT: float64
 
-    patents:
+publications:
 
-      # the URL (relative to the above "homepage") where to find patents data
-      relative path: "ExPORTER_Catalog.aspx?sid=2&index=3"
+  name: publications
+
+  relative path: "ExPORTER_Catalog.aspx?sid=0&index=2"
+
+  table number: *nih_projects_table_number
+
+  feather file: publications.feather
+
+  filename patterns to be ignored:
+    - ^javascript.*
+    - .*_AFFLNK_.*\.zip$
+
+  data types:
+
+patents:
+
+  # the URL (relative to the above "homepage") where to find patents data
+  relative path: "ExPORTER_Catalog.aspx?sid=2&index=3"
 
 output:
 
       # relative to the directory where the script is run
       downloads directory: downloads
 
+      # relative to the `downloads directory`
       unzipped files directory: unzipped
-
-      publications:
-
-        feather file: publications.feather
-
-      projects:
-
-        feather file: projects.feather
-
-# data tables specifications (you probably don't want to mess with this)
-data:
-
-  projects:
-
-    data types:
-
-      ACTIVITY: object
-      ADMINISTERING_IC: object
-      APPLICATION_ID: int64
-      APPLICATION_TYPE: float64
-      ARRA_FUNDED: object
-      AWARD_NOTICE_DATE: object
-      BUDGET_END: object
-      BUDGET_START: object
-      CFDA_CODE: object
-      CORE_PROJECT_NUM: object
-      DIRECT_COST_AMT: float64
-      ED_INST_TYPE: object
-      FOA_NUMBER: object
-      FULL_PROJECT_NUM: object
-      FUNDING_ICs: object
-      FUNDING_MECHANISM: object
-      FY: int64
-      IC_NAME: object
-      INDIRECT_COST_AMT: float64
-      NIH_SPENDING_CATS: object
-      ORG_CITY: object
-      ORG_COUNTRY: object
-      ORG_DEPT: object
-      ORG_DISTRICT: float64
-      ORG_DUNS: object
-      ORG_FIPS: object
-      ORG_IPF_CODE: float64
-      ORG_NAME: object
-      ORG_STATE: object
-      ORG_ZIPCODE: object
-      PHR: object
-      PI_IDS: object
-      PI_NAMEs: object
-      PROGRAM_OFFICER_NAME: object
-      PROJECT_END: object
-      PROJECT_START: object
-      PROJECT_TERMS: object
-      PROJECT_TITLE: object
-      SERIAL_NUMBER: object
-      STUDY_SECTION: object
-      STUDY_SECTION_NAME: object
-      SUBPROJECT_ID: float64
-      SUFFIX: object
-      SUPPORT_YEAR: object
-      TOTAL_COST: float64
-      TOTAL_COST_SUB_PROJECT: float64
-
-  publications:
-
-    data types:
