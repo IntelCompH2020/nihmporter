@@ -29,7 +29,7 @@ unzipped_files_directory = pathlib.Path(parameters['output']['unzipped files dir
 res = dict()
 
 # for both projects- and publications-related parameters...
-for p in [parameters['projects'], parameters['publications']]:
+for p in [parameters['projects'], parameters['publications'], parameters['link tables']]:
 
 	# if a previous "feather" file is not found...
 	if not pathlib.Path(p['feather file']).exists():
@@ -66,10 +66,15 @@ for p in [parameters['projects'], parameters['publications']]:
 # for the sake of convenience
 projects = res['projects']
 publications = res['publications']
+link = res['link']
 
 # some curating
 publications['LANG'] = publications['LANG'].astype('category')
 publications['PUB_YEAR'] = pd.to_datetime(publications['PUB_YEAR'], format='%Y')
 
 breakpoint()
+
+# l = link.iloc[0]
+# projects['CORE_PROJECT_NUM'] == l['PROJECT_NUMBER']
+# publications['PMID'] == l['PMID']
 

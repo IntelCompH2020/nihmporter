@@ -86,6 +86,20 @@ publications:
 
   data types:
 
+link tables:
+
+  name: link
+
+  relative path: "ExPORTER_Catalog.aspx?sid=2&index=5"
+
+  table number: *nih_projects_table_number
+
+  feather file: link.feather
+
+  filename patterns to be ignored: []
+
+  data types:
+
 patents:
 
   # the URL (relative to the above "homepage") where to find patents data
