@@ -7,6 +7,24 @@ import requests
 
 
 def parse_table(url: str, table_number: int, file_patterns_to_drop: List[Pattern]) -> pd.DataFrame:
+	"""
+	Parses an HTML table.
+
+	Parameters
+	----------
+	url: str
+		URL to the web page containing the table.
+	table_number: int
+		Among all the tables in the above web page, the position of the one to be parsed.
+	file_patterns_to_drop: list of regular expressions
+		File names' patterns that should be ignored while reading the table.
+
+	Returns
+	-------
+	out: dataframe
+		The requested table.
+
+	"""
 
 	page = requests.get(url)
 

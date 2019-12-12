@@ -28,18 +28,25 @@ unzipped_files_directory = pathlib.Path(parameters['output']['unzipped files dir
 
 res = dict()
 
+# for both projects- and publications-related parameters...
 for p in [parameters['projects'], parameters['publications']]:
 
+	# if a previous "feather" file is not found...
 	if not pathlib.Path(p['feather file']).exists():
 
+		# the URL to the appropriate subpage within the NIH homepage
 		url = urllib.parse.urljoin(nih_homepage, p['relative path'])
 
+		# regular expressions defining the files that must be ignored
 		regular_expressions = [re.compile(expr) for expr in p['filename patterns to be ignored']]
 
+		# the appointed table at the above URL is parsed into a `DataFrame`
 		df = parser.parse_table(url, p['table number'], regular_expressions)
 
+		# the directory in which data files are to be unzipped
 		unzipped_files_directory = downloads_directory / unzipped_files_directory / p['name']
 
+		# CSV links specified in the `DataFrame` are downloaded and uncompressed
 		downloaded_files, uncompressed_files = download.files_list(
 			df['CSV_link'], downloads_directory, nih_homepage, df['CSV'], unzip_to=unzipped_files_directory)
 
@@ -47,6 +54,7 @@ for p in [parameters['projects'], parameters['publications']]:
 
 		df.to_feather(p['feather file'])
 
+	# if a previous "feather" file is found...
 	else:
 
 		print(f'loading {p["feather file"]}...')
@@ -54,6 +62,14 @@ for p in [parameters['projects'], parameters['publications']]:
 		df = pd.read_feather(p['feather file'])
 
 	res[p['name']] = df
+
+# for the sake of convenience
+projects = res['projects']
+publications = res['publications']
+
+# some curating
+publications['LANG'] = publications['LANG'].astype('category')
+publications['PUB_YEAR'] = pd.to_datetime(publications['PUB_YEAR'], format='%Y')
 
 breakpoint()
 
