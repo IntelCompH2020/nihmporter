@@ -6,7 +6,9 @@ import bs4 as bs
 import requests
 
 
-def parse_table(url: str, table_number: int, file_patterns_to_drop: List[Pattern]) -> pd.DataFrame:
+def parse_table(
+		url: str, table_number: int, file_patterns_to_drop: List[Pattern], xml_files_also_present: bool = True
+) -> pd.DataFrame:
 	"""
 	Parses an HTML table.
 
@@ -18,6 +20,8 @@ def parse_table(url: str, table_number: int, file_patterns_to_drop: List[Pattern
 		Among all the tables in the above web page, the position of the one to be parsed.
 	file_patterns_to_drop: list of regular expressions
 		File names' patterns that should be ignored while reading the table.
+	xml_files_also_present: bool, optional
+		Whether links for XML files are also present in the table.
 
 	Returns
 	-------
@@ -51,10 +55,21 @@ def parse_table(url: str, table_number: int, file_patterns_to_drop: List[Pattern
 
 		links = [l for l in links if not pattern.match(l)]
 
-	# the links for the XML files are added to the `DataFrame`...
-	df['XML_link'] = links[::2]
+	# if links for XML files are also expected...
+	if xml_files_also_present:
 
-	# ...and so are those for CSV's
-	df['CSV_link'] = links[1::2]
+		# ...they are added to the `DataFrame`...
+		df['XML_link'] = links[::2]
+
+		# ...and so are those for CSV's
+		df['CSV_link'] = links[1::2]
+
+		# NOTE: this assume links for XML come first
+
+	# if *no* links for XML files are expected...
+	else:
+
+		# ...all the links are referred to CSV files
+		df['CSV_link'] = links
 
 	return df

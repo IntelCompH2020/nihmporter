@@ -23,6 +23,7 @@ projects:
   # data types specification (you probably don't want to mess with this)
   data types:
 
+    # these were obtained by adapting those returned  by `util.dataframe_types_to_yaml`
     ACTIVITY: object
     ADMINISTERING_IC: object
     APPLICATION_ID: int64
@@ -102,8 +103,26 @@ link tables:
 
 patents:
 
-  # the URL (relative to the above "homepage") where to find patents data
+  name: patents
+
   relative path: "ExPORTER_Catalog.aspx?sid=2&index=3"
+
+  table number: *nih_projects_table_number
+
+  feather file: patents.feather
+
+  filename patterns to be ignored: []
+
+  data types:
+
+  # extra parameters that *might* be passed to functions:
+  extra parameters:
+
+    parse_table:
+
+      # there are no XML files for patents
+      xml_files_also_present: False
+
 
 output:
 
