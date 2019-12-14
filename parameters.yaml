@@ -1,4 +1,14 @@
-homepage: "https://exporter.nih.gov"
+common:
+
+  homepage: "https://exporter.nih.gov"
+
+  output:
+
+    # relative to the directory where the script is run
+    downloads directory: downloads
+
+    # relative to the `downloads directory`
+    unzipped files directory: unzipped
 
 projects:
 
@@ -114,20 +124,3 @@ patents:
   filename patterns to be ignored: []
 
   data types:
-
-  # extra parameters that *might* be passed to functions:
-  extra parameters:
-
-    parse_table:
-
-      # there are no XML files for patents
-      xml_files_also_present: False
-
-
-output:
-
-      # relative to the directory where the script is run
-      downloads directory: downloads
-
-      # relative to the `downloads directory`
-      unzipped files directory: unzipped
