@@ -95,12 +95,15 @@ class DataBunch:
 			# the appointed table at the above URL is parsed into a `DataFrame`
 			df = self.parse_html_table()
 
-			# the directory in which data files are to be unzipped
-			unzipped_files_directory = self.downloads_directory / self.unzipped_files_directory / self.name
+			# the directory in which zip files are to be downloaded
+			downloads_directory = self.downloads_directory / self.name
+
+			# they are afterwards unzipped here
+			unzipped_files_directory = downloads_directory / self.unzipped_files_directory
 
 			# CSV links specified in the `DataFrame` are downloaded and uncompressed
-			downloaded_files, uncompressed_files = download.files_list(
-				df['CSV_link'], self.downloads_directory, self.nih_homepage, df['CSV'], unzip_to=unzipped_files_directory)
+			_, uncompressed_files = download.files_list(
+				df['CSV_link'], downloads_directory, self.nih_homepage, df['CSV'], unzip_to=unzipped_files_directory)
 
 			# a single `DataFrame` is built from all the CSV files...
 			df = util.dataframe_from_csv_files(uncompressed_files, self.parameters['data types'])
