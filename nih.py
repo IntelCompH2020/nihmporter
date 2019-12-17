@@ -73,6 +73,22 @@ class DataBunch:
 
 	@staticmethod
 	def _merge_links(df: pd.DataFrame, links: List[str]) -> pd.DataFrame:
+		"""
+		Add columns for the links to the `DataFrame`.
+
+		Parameters
+		----------
+		df: dataframe
+			Input data.
+		links: list of str
+			Links.
+
+		Returns
+		-------
+		out: dataframe
+			Input with one or more columns storing the link(s) associated with every row.
+
+		"""
 
 		# links for XML files are added to the `DataFrame`...
 		df['XML_link'] = links[::2]
@@ -138,6 +154,16 @@ class DataBunch:
 
 		# the result is cached
 		self.df = df
+
+		return df
+
+
+class ProjectsDataBunch(DataBunch):
+
+	@staticmethod
+	def post_process(df: pd.DataFrame) -> pd.DataFrame:
+
+		df['APPLICATION_TYPE'] = df['APPLICATION_TYPE'].astype('category')
 
 		return df
 
