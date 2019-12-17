@@ -69,10 +69,10 @@ class DataBunch:
 
 			links = [l for l in links if not pattern.match(l)]
 
-		return self.merge_links(df, links)
+		return self._merge_links(df, links)
 
 	@staticmethod
-	def merge_links(df: pd.DataFrame, links: List[str]) -> pd.DataFrame:
+	def _merge_links(df: pd.DataFrame, links: List[str]) -> pd.DataFrame:
 
 		# links for XML files are added to the `DataFrame`...
 		df['XML_link'] = links[::2]
@@ -84,15 +84,29 @@ class DataBunch:
 
 	@staticmethod
 	def post_process(df: pd.DataFrame) -> pd.DataFrame:
+		"""
+		Convenience method to allow applying some custom processing to the `DataFrame` storing the data downloaded.
+
+		Parameters
+		----------
+		df: dataframe
+			Input dataframe to be processed.
+
+		Returns
+		-------
+		out: dataframe
+			Modified dataframe.
+
+		"""
 
 		return df
 
-	def __call__(self, *args, **kwargs) -> pd.DataFrame:
+	def get(self) -> pd.DataFrame:
 
 		# if a previous "feather" file is not found...
 		if not self.feather_file.exists():
 
-			# the appointed table at the above URL is parsed into a `DataFrame`
+			# the appointed table at the given URL is parsed into a `DataFrame`
 			df = self.parse_html_table()
 
 			# the directory in which zip files are to be downloaded
@@ -142,7 +156,7 @@ class PublicationsDataBunch(DataBunch):
 class PatentsDataBunch(DataBunch):
 
 	@staticmethod
-	def merge_links(df: pd.DataFrame, links: List[str]) -> pd.DataFrame:
+	def _merge_links(df: pd.DataFrame, links: List[str]) -> pd.DataFrame:
 
 		# only links for XML files are expected...
 		df['CSV_link'] = links
