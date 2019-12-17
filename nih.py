@@ -23,6 +23,7 @@ class DataBunch:
 		self.downloads_directory = pathlib.Path(parameters['output']['downloads directory'])
 		self.unzipped_files_directory = pathlib.Path(parameters['output']['unzipped files directory'])
 		self.feather_file = pathlib.Path(parameters['feather file'])
+		self.key_columns = parameters['key columns']
 
 		# the URL to the appropriate subpage within the NIH homepage
 		self.url = urllib.parse.urljoin(parameters['homepage'], parameters['relative path'])
@@ -156,6 +157,29 @@ class DataBunch:
 		self.df = df
 
 		return df
+
+	def key_columns_to_csv(self, filename: str, drop_nan: bool = True) -> None:
+		"""
+		Exports `key_columns` to a CSV file.
+
+		Parameters
+		----------
+		filename: str
+			Output file name.
+		drop_nan: bool
+			Whether or not `nan`s should be excluded prior to saving.
+
+		"""
+
+		to_csv_parameters = dict(path_or_buf=filename, header=True, index=False)
+
+		if drop_nan:
+
+			self.df[self.key_columns].dropna().drop_duplicates().to_csv(**to_csv_parameters)
+
+		else:
+
+			self.df[self.key_columns].drop_duplicates().to_csv(**to_csv_parameters)
 
 
 class ProjectsDataBunch(DataBunch):

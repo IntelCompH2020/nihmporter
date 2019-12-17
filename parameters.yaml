@@ -30,10 +30,13 @@ projects:
     - .*_DUNS_.*\.zip$
     - .*_PRJFUNDING_.*\.zip$
 
-  # data types specification (you probably don't want to mess with this)
+  # columns that unequivocally identify elements here (they need not be unique)
+  key columns: [CORE_PROJECT_NUM]
+
+  # data types specification (you probably don't want to mess with this); if blank, it is inferred
   data types:
 
-    # these were obtained by adapting those returned  by `util.dataframe_types_to_yaml`
+    # these were obtained by *adapting* those returned  by `util.dataframe_types_to_yaml`
     ACTIVITY: object
     ADMINISTERING_IC: object
     APPLICATION_ID: int64
@@ -95,6 +98,8 @@ publications:
     - ^javascript.*
     - .*_AFFLNK_.*\.zip$
 
+  key columns: [PMID]
+
   data types:
 
 link tables:
@@ -109,6 +114,8 @@ link tables:
 
   filename patterns to be ignored: []
 
+  key columns: [PMID, PROJECT_NUMBER]
+
   data types:
 
 patents:
@@ -122,5 +129,7 @@ patents:
   feather file: patents.feather
 
   filename patterns to be ignored: []
+
+  key columns: [PATENT_ID, PROJECT_ID]
 
   data types:
