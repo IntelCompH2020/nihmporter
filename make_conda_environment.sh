@@ -7,4 +7,4 @@ NAME=nih
 
 conda create --yes -n $NAME python=3 pyyaml colorama pandas pyarrow ipdb jupyterlab lxml beautifulsoup4 requests -c defaults -c conda-forge
 
-#conda activate $NAME
+echo new environment is \"$NAME\"
