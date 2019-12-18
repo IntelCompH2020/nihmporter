@@ -18,11 +18,14 @@ class DataBunch:
 
 		self.parameters = parameters
 
-		self.nih_homepage = parameters['homepage']
 		self.name = parameters['name']
+
+		self.feather_file = pathlib.Path(self.name + '.feather')
+		self.csv_file = self.feather_file.with_suffix('.csv')
+
+		self.nih_homepage = parameters['homepage']
 		self.downloads_directory = pathlib.Path(parameters['output']['downloads directory'])
 		self.unzipped_files_directory = pathlib.Path(parameters['output']['unzipped files directory'])
-		self.feather_file = pathlib.Path(parameters['feather file'])
 		self.key_columns = parameters['key columns']
 
 		# the URL to the appropriate subpage within the NIH homepage
@@ -119,6 +122,15 @@ class DataBunch:
 		return df
 
 	def get(self) -> pd.DataFrame:
+		"""
+		Gets the data associated to this `DataBunch`.
+
+		Returns
+		-------
+		out: dataframe
+			Requested data.
+
+		"""
 
 		# if a previous "feather" file is not found...
 		if not self.feather_file.exists():
@@ -158,18 +170,24 @@ class DataBunch:
 
 		return df
 
-	def key_columns_to_csv(self, filename: str, drop_nan: bool = True) -> None:
+	def key_columns_to_csv(self, filename: str = None, drop_nan: bool = True) -> None:
 		"""
 		Exports `key_columns` to a CSV file.
 
 		Parameters
 		----------
-		filename: str
+		filename: str, optional
 			Output file name.
 		drop_nan: bool
 			Whether or not `nan`s should be excluded prior to saving.
 
 		"""
+
+		# if a file name was not provided...
+		if not filename:
+
+			# ...the default one is used
+			filename = self.csv_file
 
 		to_csv_parameters = dict(path_or_buf=filename, header=True, index=False)
 

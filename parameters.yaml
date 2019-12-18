@@ -12,7 +12,7 @@ common:
 
 projects:
 
-  # to be used when saving
+  # to be used in naming
   name: projects
 
   # the URL (relative to the above "homepage") where to find projects data
@@ -20,9 +20,6 @@ projects:
 
   # the position of the table of interest when considering all the tables in the URL
   table number: &nih_projects_table_number 12
-
-  # the name of the (feather) file in/from which the data will be saved/loaded
-  feather file: projects.feather
 
   # (Python) regular expressions for (linked) files to be ignored
   filename patterns to be ignored:
@@ -92,8 +89,6 @@ publications:
 
   table number: *nih_projects_table_number
 
-  feather file: publications.feather
-
   filename patterns to be ignored:
     - ^javascript.*
     - .*_AFFLNK_.*\.zip$
@@ -110,8 +105,6 @@ link tables:
 
   table number: *nih_projects_table_number
 
-  feather file: link.feather
-
   filename patterns to be ignored: []
 
   key columns: [PMID, PROJECT_NUMBER]
@@ -125,8 +118,6 @@ patents:
   relative path: "ExPORTER_Catalog.aspx?sid=2&index=3"
 
   table number: *nih_projects_table_number
-
-  feather file: patents.feather
 
   filename patterns to be ignored: []
 

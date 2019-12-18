@@ -26,7 +26,7 @@ for data_bunch in [projects, publications, links, patents]:
 	data_bunch.get()
 
 	# "key columns" are exported to a CSV file
-	data_bunch.key_columns_to_csv(data_bunch.name + '.csv')
+	data_bunch.key_columns_to_csv()
 
 # grouped_projects = projects.df.groupby('CORE_PROJECT_NUM')
 # grouped_projects.get_group('ZIJAR041172')
