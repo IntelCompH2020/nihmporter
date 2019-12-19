@@ -30,7 +30,7 @@ for data_bunch in [projects, publications, links, patents, abstracts]:
 	data_bunch.key_columns_to_csv()
 
 	# in order to avoid "out of memory" errors
-	del data_bunch
+	del data_bunch.df
 
 # grouped_projects = projects.df.groupby('CORE_PROJECT_NUM')
 # grouped_projects.get_group('ZIJAR041172')

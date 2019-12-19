@@ -10,6 +10,7 @@ import requests
 
 import download
 import util
+import colors
 
 
 class DataBunch:
@@ -161,13 +162,15 @@ class DataBunch:
 			# ...it is post-processed...
 			df = self.post_process(df)
 
+			print(f'{colors.info}writing {colors.reset}"{self.binary_output_file}"')
+
 			# ...and saved
 			self.save_df(df)
 
 		# if a previous "binary output" file is found...
 		else:
 
-			print(f'loading {self.binary_output_file}...')
+			print(f'{colors.info}loading {colors.reset}"{self.binary_output_file}"')
 
 			# ...data are directly loaded from it
 			df = self.load_df()
@@ -193,7 +196,9 @@ class DataBunch:
 		# if there are no key columns...
 		if not self.key_columns:
 
-			print(f'CSV file for "{self.name}" would be empty...skipping')
+			print(f'{colors.warning}CSV file for {colors.reset}"{self.name}"{colors.warning} would be empty...skipping')
+
+			return
 
 		# if a file name was not provided...
 		if not filename:

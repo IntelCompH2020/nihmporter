@@ -21,7 +21,7 @@ projects:
   # the position of the table of interest when considering all the tables in the URL
   table number: &nih_projects_table_number 12
 
-  # (Python) regular expressions for (linked) files to be ignored
+  # (Python) regular expressions meant to match (linked) files to be ignored
   filename patterns to be ignored:
     - ^javascript.*
     - .*_DUNS_.*\.zip$

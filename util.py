@@ -42,8 +42,9 @@ def dataframe_from_csv_files(
 		# the new `DataFrame` is added to the above list
 		dfs_list.append(csv_file_df)
 
-	# all the `DataFrame`s are concatenated together
-	df = pd.concat(dfs_list, axis=0)
+	# all the `DataFrame`s are (vertically) concatenated; they need *not* have the exact same columns, but (by default)
+	# an "outer" join is performed, and the columns are sorted
+	df = pd.concat(dfs_list, axis=0, sort=True)
 
 	# in order to save the `DataFrame` in a feather file, we need to reset the index
 	df.reset_index(inplace=True)
