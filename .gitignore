@@ -3,6 +3,7 @@ changelog
 /* *.csv */
 downloads
 *.feather
+*.pickle
 *.csv
 __pycache__
 wiki

@@ -124,3 +124,18 @@ patents:
   key columns: [PATENT_ID, PROJECT_ID]
 
   data types:
+
+abstracts:
+
+  name: abstracts
+
+  relative path: "ExPORTER_Catalog.aspx?sid=0&index=1"
+
+  table number: *nih_projects_table_number
+
+  filename patterns to be ignored: []
+
+  key columns: [APPLICATION_ID]
+
+  data types:
+

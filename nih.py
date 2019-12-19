@@ -20,8 +20,7 @@ class DataBunch:
 
 		self.name = parameters['name']
 
-		self.feather_file = pathlib.Path(self.name + '.feather')
-		self.csv_file = self.feather_file.with_suffix('.csv')
+		self.binary_output_file = pathlib.Path(self.name + '.feather')
 
 		self.nih_homepage = parameters['homepage']
 		self.downloads_directory = pathlib.Path(parameters['output']['downloads directory'])
@@ -36,6 +35,14 @@ class DataBunch:
 
 		# to act as cache
 		self.df: Optional[pd.DataFrame] = None
+
+	def load_df(self) -> pd.DataFrame:
+
+		return pd.read_feather(self.binary_output_file)
+
+	def save_df(self, df: pd.DataFrame) -> None:
+
+		df.to_feather(self.binary_output_file)
 
 	def parse_html_table(self) -> pd.DataFrame:
 		"""
@@ -132,8 +139,8 @@ class DataBunch:
 
 		"""
 
-		# if a previous "feather" file is not found...
-		if not self.feather_file.exists():
+		# if a previous "binary output" file is not found...
+		if not self.binary_output_file.exists():
 
 			# the appointed table at the given URL is parsed into a `DataFrame`
 			df = self.parse_html_table()
@@ -154,16 +161,16 @@ class DataBunch:
 			# ...it is post-processed...
 			df = self.post_process(df)
 
-			# ...and saved in "feather" format
-			df.to_feather(self.feather_file)
+			# ...and saved
+			self.save_df(df)
 
-		# if a previous "feather" file is found...
+		# if a previous "binary output" file is found...
 		else:
 
-			print(f'loading {self.feather_file}...')
+			print(f'loading {self.binary_output_file}...')
 
 			# ...data are directly loaded from it
-			df = pd.read_feather(self.feather_file)
+			df = self.load_df()
 
 		# the result is cached
 		self.df = df
@@ -183,11 +190,16 @@ class DataBunch:
 
 		"""
 
+		# if there are no key columns...
+		if not self.key_columns:
+
+			print(f'CSV file for "{self.name}" would be empty...skipping')
+
 		# if a file name was not provided...
 		if not filename:
 
 			# ...the default one is used
-			filename = self.csv_file
+			filename = self.binary_output_file.with_suffix('.csv')
 
 		to_csv_parameters = dict(path_or_buf=filename, header=True, index=False)
 
@@ -230,3 +242,21 @@ class PatentsDataBunch(DataBunch):
 		df['CSV_link'] = links
 
 		return df
+
+
+class AbstractsDataBunch(DataBunch):
+
+	def __init__(self, parameters: dict) -> None:
+
+		super().__init__(parameters)
+
+		self.binary_output_file = self.binary_output_file.with_suffix('.pickle')
+
+	def load_df(self) -> pd.DataFrame:
+
+		return pd.read_pickle(self.binary_output_file)
+
+	def save_df(self, df: pd.DataFrame) -> None:
+
+		df.to_pickle(self.binary_output_file)
+
