@@ -19,7 +19,7 @@ projects:
   relative path: "ExPORTER_Catalog.aspx?sid=1&index=0"
 
   # the position of the table of interest when considering all the tables in the URL
-  table number: &nih_projects_table_number 12
+  table number: &nih_projects_table_number 13
 
   # (Python) regular expressions meant to match (linked) files to be ignored
   filename patterns to be ignored:

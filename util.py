@@ -33,8 +33,7 @@ def dataframe_from_csv_files(
 	# for every csv file in the unzipped files directory...
 	for csv_file in csv_files:
 
-		# ...the file is read into a `DataFrame`
-		csv_file_df = pd.read_csv(csv_file, encoding='iso8859_15', dtype=dtype)
+		csv_file_df = pd.read_csv(csv_file, encoding='iso8859_15', dtype=dtype, error_bad_lines=False)
 
 		# a new (metadata) column is added to indicate the "source" file
 		csv_file_df[source_column] = csv_file.name

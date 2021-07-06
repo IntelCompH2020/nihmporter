@@ -68,8 +68,13 @@ class DataBunch:
 
 		table_of_interest = tables[self.parameters['table number']]
 
+		table_of_interest_dfs = pd.read_html(str(table_of_interest), encoding='utf-8', header=0)
+
+		# if there is more than one Pandas table in the selected HTML table, then something is off
+		assert len(table_of_interest_dfs) == 1
+
 		# the table of interest is further parsed into a Pandas `DataFrame`
-		df = pd.read_html(str(table_of_interest), encoding='utf-8', header=0)[0]
+		df = table_of_interest_dfs[0]
 
 		# a numpy array with either links or "no link"s
 		links = [np.where(tag.has_attr('href'), tag.get('href'), 'no link') for tag in table_of_interest.find_all('a')]
@@ -77,14 +82,20 @@ class DataBunch:
 		# it is turned into a regular Python list and stored as an instance attribute for later use
 		links = [l.item() for l in links]
 
+		# every regular expression that is NOT considered an URL...
 		for pattern in self.re_files_to_be_ignored:
 
+			# ...is used to trim the list
 			links = [l for l in links if not pattern.match(l)]
+
+		# pd.set_option('display.max_colwidth', 1700)
+		# foo = self._merge_links(df, links)
+		# foo[['Project File Name', 'CSV_link']]
 
 		return self._merge_links(df, links)
 
-	@staticmethod
-	def _merge_links(df: pd.DataFrame, links: List[str]) -> pd.DataFrame:
+	@classmethod
+	def _merge_links(cls, df: pd.DataFrame, links: List[str]) -> pd.DataFrame:
 		"""
 		Add columns for the links to the `DataFrame`.
 
@@ -107,6 +118,44 @@ class DataBunch:
 
 		# ...and so are those for CSV files
 		df['CSV_link'] = links[1::2]
+
+		return df
+
+	@staticmethod
+	def _merge_links_matching_year_wise(
+			df: pd.DataFrame, links: List[str], year_in_project_file_name_pattern: str,
+			type_format_year_in_zip_file_name_pattern: str, type_of_interest: str) -> pd.DataFrame:
+
+		year_series = df['Project File Name'].str.extract(year_in_project_file_name_pattern)[0].astype(pd.StringDtype())
+
+		# there are no duplicates
+		assert not year_series.duplicated().any()
+
+		# it is set as index
+		df.set_index(year_series, inplace=True)
+
+		# for exploiting Pandas capabilities, the list of links is turned into a `Series` of strings
+		raw_links_series = pd.Series(links, dtype=pd.StringDtype()).rename('URL')
+
+		# links are parsed
+		# type: PUBlication or AFFiLiation
+		# format: Csv or Xml
+		links_type_format_year_df = raw_links_series.str.extract(type_format_year_in_zip_file_name_pattern).rename(
+			{0: 'type', 1: 'format', 2: 'year'}, axis=1)
+
+		# boolean indicating which rows contain at list one link
+		contains_links = ~links_type_format_year_df.isna().all(axis=1)
+
+		# links are concatenated with the extracted fields, rows without links are dropped, and year is used as index
+		links_df = pd.concat([raw_links_series, links_type_format_year_df], axis=1)[contains_links].set_index('year')
+
+		is_csv_about_pub = (links_df['type'] == type_of_interest) & (links_df['format'] == 'C')
+		df['CSV_link'] = np.nan
+		df.loc[:, 'CSV_link'] = links_df[is_csv_about_pub]['URL']
+
+		is_xml_about_pub = (links_df['type'] == type_of_interest) & (links_df['format'] == 'X')
+		df['XML_link'] = np.nan
+		df.loc[:, 'XML_link'] = links_df[is_xml_about_pub]['URL']
 
 		return df
 
@@ -229,6 +278,8 @@ class ProjectsDataBunch(DataBunch):
 
 class PublicationsDataBunch(DataBunch):
 
+	year_in_project_file_name_pattern = r'.*year (\d{4})'
+
 	@staticmethod
 	def post_process(df: pd.DataFrame) -> pd.DataFrame:
 
@@ -237,11 +288,17 @@ class PublicationsDataBunch(DataBunch):
 
 		return df
 
+	@classmethod
+	def _merge_links(cls, df: pd.DataFrame, links: List[str]) -> pd.DataFrame:
+
+		return cls._merge_links_matching_year_wise(
+			df, links, cls.year_in_project_file_name_pattern, r'_(PUB|AFFLNK)_([CX])_(\d{4}).zip', r'PUB')
+
 
 class PatentsDataBunch(DataBunch):
 
-	@staticmethod
-	def _merge_links(df: pd.DataFrame, links: List[str]) -> pd.DataFrame:
+	@classmethod
+	def _merge_links(cls, df: pd.DataFrame, links: List[str]) -> pd.DataFrame:
 
 		# only links for XML files are expected...
 		df['CSV_link'] = links
@@ -265,3 +322,13 @@ class AbstractsDataBunch(DataBunch):
 
 		df.to_pickle(self.binary_output_file)
 
+
+class LinksDataBunch(DataBunch):
+
+	year_in_project_file_name_pattern = r'.*Publications (\d{4}) link tables'
+
+	@classmethod
+	def _merge_links(cls, df: pd.DataFrame, links: List[str]) -> pd.DataFrame:
+
+		return cls._merge_links_matching_year_wise(
+			df, links, cls.year_in_project_file_name_pattern, r'_(PUBLNK)_([CX])_(\d{4}).zip', r'PUBLNK')

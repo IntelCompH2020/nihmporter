@@ -63,7 +63,7 @@ def files_list(
 	if sizes is not None:
 
 		# ...we make sure there is one size per file
-		assert len(files_relative_paths) ==  len(sizes)
+		assert len(files_relative_paths) == len(sizes)
 
 	# if no `Collection` of sizes was passed...
 	else:

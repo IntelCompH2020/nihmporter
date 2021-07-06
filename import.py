@@ -16,7 +16,7 @@ with open('parameters.yaml') as yaml_data:
 
 projects = nih.ProjectsDataBunch({**parameters['common'], **parameters['projects']})
 publications = nih.PublicationsDataBunch({**parameters['common'], **parameters['publications']})
-links = nih.DataBunch({**parameters['common'], **parameters['link tables']})
+links = nih.LinksDataBunch({**parameters['common'], **parameters['link tables']})
 patents = nih.PatentsDataBunch({**parameters['common'], **parameters['patents']})
 abstracts = nih.AbstractsDataBunch({**parameters['common'], **parameters['abstracts']})
 
