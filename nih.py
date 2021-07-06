@@ -19,8 +19,10 @@ class DataBunch:
 
 		self.parameters = parameters
 
+		# the name of this `DataBunch` is used...
 		self.name = parameters['name']
 
+		# ...in naming the output file
 		self.binary_output_file = pathlib.Path(self.name + '.feather')
 
 		self.nih_homepage = parameters['homepage']
@@ -66,14 +68,17 @@ class DataBunch:
 		# ...and *all* the tables extracted
 		tables = sp.find_all('table')
 
+		# it is known beforehand the "position" of the table of interest...
 		table_of_interest = tables[self.parameters['table number']]
 
+		# ...still, when asked to read html, `Pandas` returns a list of `DataFrame`s
 		table_of_interest_dfs = pd.read_html(str(table_of_interest), encoding='utf-8', header=0)
 
 		# if there is more than one Pandas table in the selected HTML table, then something is off
-		assert len(table_of_interest_dfs) == 1
+		assert len(table_of_interest_dfs) == 1,\
+			f'the table for "{self.name}" has most likely moved to a different position in the webpage'
 
-		# the table of interest is further parsed into a Pandas `DataFrame`
+		# the only element in the list above is selected
 		df = table_of_interest_dfs[0]
 
 		# a numpy array with either links or "no link"s
@@ -97,21 +102,23 @@ class DataBunch:
 	@classmethod
 	def _merge_links(cls, df: pd.DataFrame, links: List[str]) -> pd.DataFrame:
 		"""
-		Add columns for the links to the `DataFrame`.
+		Incorporate the passed `links` to the given `DataFrame`. The latter is modified in-place.
 
 		Parameters
 		----------
-		df: dataframe
+		df: `DataFrame`
 			Input data.
 		links: list of str
 			Links.
 
 		Returns
 		-------
-		out: dataframe
-			Input with one or more columns storing the link(s) associated with every row.
+		out: `DataFrame`
+			Input `DataFrame` with two more columns storing the links associated with every row.
 
 		"""
+
+		assert len(links) % 2 == 0, 'the number of links is not even (XML & CSV)'
 
 		# links for XML files are added to the `DataFrame`...
 		df['XML_link'] = links[::2]
@@ -122,9 +129,34 @@ class DataBunch:
 		return df
 
 	@staticmethod
-	def _merge_links_matching_year_wise(
+	def _matching_year_merge_links(
 			df: pd.DataFrame, links: List[str], year_in_project_file_name_pattern: str,
 			type_format_year_in_zip_file_name_pattern: str, type_of_interest: str) -> pd.DataFrame:
+		"""
+		Incorporate the passed `links` to the given `DataFrame` while accounting for the year (as stated in the
+		"Project File Name" field, and the name of the file to be downloaded). The input `DataFrame` is modified in-place.
+
+		Parameters
+		----------
+		df : `DataFrame`
+			Input data.
+		links : list of str
+			Links.
+		year_in_project_file_name_pattern : str
+			Regular expression for capturing the year in the field "Project File Name".
+		type_format_year_in_zip_file_name_pattern : str
+			Regular expression for capturing the "type", "format" and year of the data in the name of the file to be
+			downloaded.
+		type_of_interest : str
+			The type of interest as captured by `year_in_project_file_name_pattern`
+			(notice the latter might capture more than one type using a "| construction")
+
+		Returns
+		-------
+		out: `DataFrame`
+			Input `DataFrame` with two more columns storing the links associated with every row.
+
+		"""
 
 		year_series = df['Project File Name'].str.extract(year_in_project_file_name_pattern)[0].astype(pd.StringDtype())
 
@@ -291,7 +323,7 @@ class PublicationsDataBunch(DataBunch):
 	@classmethod
 	def _merge_links(cls, df: pd.DataFrame, links: List[str]) -> pd.DataFrame:
 
-		return cls._merge_links_matching_year_wise(
+		return cls._matching_year_merge_links(
 			df, links, cls.year_in_project_file_name_pattern, r'_(PUB|AFFLNK)_([CX])_(\d{4}).zip', r'PUB')
 
 
@@ -330,5 +362,5 @@ class LinksDataBunch(DataBunch):
 	@classmethod
 	def _merge_links(cls, df: pd.DataFrame, links: List[str]) -> pd.DataFrame:
 
-		return cls._merge_links_matching_year_wise(
+		return cls._matching_year_merge_links(
 			df, links, cls.year_in_project_file_name_pattern, r'_(PUBLNK)_([CX])_(\d{4}).zip', r'PUBLNK')

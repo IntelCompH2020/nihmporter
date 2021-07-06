@@ -7,3 +7,4 @@ downloads
 *.csv
 __pycache__
 wiki
+.ipynb_checkpoints/
