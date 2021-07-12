@@ -91,7 +91,7 @@ publications:
 
   filename patterns to be ignored:
     - ^javascript.*
-    - .*_AFFLNK_.*\.zip$
+#    - .*_AFFLNK_.*\.zip$
 
   key columns: [PMID]
 
