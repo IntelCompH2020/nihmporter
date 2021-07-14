@@ -30,7 +30,7 @@ def dataframe_from_csv_files(
 	# a list with a `DataFrame` for every csv file
 	dfs_list = []
 
-	# for every csv file in the unzipped files directory...
+	# for every csv file in the unzipped files subdirectory...
 	for csv_file in csv_files:
 
 		csv_file_df = pd.read_csv(csv_file, encoding='iso8859_15', dtype=dtype, error_bad_lines=False)

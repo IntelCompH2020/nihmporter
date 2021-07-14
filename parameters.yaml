@@ -5,10 +5,12 @@ common:
   output:
 
     # relative to the directory where the script is run
-    downloads directory: downloads
+    downloads directory: &output_downloads_directory downloads
 
     # relative to the `downloads directory`
-    unzipped files directory: unzipped
+    unzipped files subdirectory: unzipped
+
+    dataframes directory: *output_downloads_directory
 
 projects:
 
@@ -81,21 +83,46 @@ projects:
     TOTAL_COST: float64
     TOTAL_COST_SUB_PROJECT: float64
 
+# =======================================================================
+
 publications:
 
   name: publications
 
-  relative path: "ExPORTER_Catalog.aspx?sid=0&index=2"
+  relative path: &publications_relative_path "ExPORTER_Catalog.aspx?sid=0&index=2"
 
   table number: *nih_projects_table_number
 
-  filename patterns to be ignored:
+  filename patterns to be ignored: &publications_filename_patterns_to_be_ignored
     - ^javascript.*
 #    - .*_AFFLNK_.*\.zip$
 
   key columns: [PMID]
 
+  data types: &publications_data_types
+
+# =======================================================================
+
+publications author affiliations:
+
+  name: publications_author_affiliations
+
+  relative path: *publications_relative_path
+
+  table number: *nih_projects_table_number
+
+  filename patterns to be ignored: *publications_filename_patterns_to_be_ignored
+
+  key columns: [AFFILIATION, AUTHOR_NAME, PMID]
+
+#  data types: *publications_data_types
   data types:
+    AFFILIATION: object
+    AUTHOR_NAME: object
+    AUTH_TRANS_ID: object
+    PMID: int64
+
+# =======================================================================
 
 link tables:
 
@@ -111,6 +138,8 @@ link tables:
 
   data types:
 
+# =======================================================================
+
 patents:
 
   name: patents
@@ -124,6 +153,8 @@ patents:
   key columns: [PATENT_ID, PROJECT_ID]
 
   data types:
+
+# =======================================================================
 
 abstracts:
 

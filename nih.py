@@ -23,11 +23,11 @@ class DataBunch:
 		self.name = parameters['name']
 
 		# ...in naming the output file
-		self.binary_output_file = pathlib.Path(self.name + '.feather')
+		self.binary_output_file = pathlib.Path(parameters['output']['dataframes directory']) / (self.name + '.feather')
 
 		self.nih_homepage = parameters['homepage']
 		self.downloads_directory = pathlib.Path(parameters['output']['downloads directory'])
-		self.unzipped_files_directory = pathlib.Path(parameters['output']['unzipped files directory'])
+		self.unzipped_files_directory = pathlib.Path(parameters['output']['unzipped files subdirectory'])
 		self.key_columns = parameters['key columns']
 
 		# the URL to the appropriate subpage within the NIH homepage
@@ -225,7 +225,7 @@ class DataBunch:
 		if not self.binary_output_file.exists():
 
 			# the appointed table at the given URL is parsed into a `DataFrame`
-			df = self.parse_html_table()
+			html_table_df = self.parse_html_table()
 
 			# the directory in which zip files are to be downloaded
 			downloads_directory = self.downloads_directory / self.name
@@ -235,18 +235,19 @@ class DataBunch:
 
 			# CSV links specified in the `DataFrame` are downloaded and uncompressed
 			_, uncompressed_files = download.files_list(
-				df['CSV_link'], downloads_directory, self.nih_homepage, df['CSV'], unzip_to=unzipped_files_directory)
+				html_table_df['CSV_link'], downloads_directory, self.nih_homepage, html_table_df['CSV'],
+				unzip_to=unzipped_files_directory)
 
 			# a single `DataFrame` is built from all the CSV files...
-			df = util.dataframe_from_csv_files(uncompressed_files, self.parameters['data types'])
+			csv_df = util.dataframe_from_csv_files(uncompressed_files, self.parameters['data types'])
 
 			# ...it is post-processed...
-			df = self.post_process(df)
+			csv_df = self.post_process(csv_df)
 
 			print(f'{colors.info}writing {colors.reset}"{self.binary_output_file}"')
 
 			# ...and saved
-			self.save_df(df)
+			self.save_df(csv_df)
 
 		# if a previous "binary output" file is found...
 		else:
@@ -254,12 +255,12 @@ class DataBunch:
 			print(f'{colors.info}loading {colors.reset}"{self.binary_output_file}"')
 
 			# ...data are directly loaded from it
-			df = self.load_df()
+			csv_df = self.load_df()
 
 		# the result is cached
-		self.df = df
+		self.df = csv_df
 
-		return df
+		return csv_df
 
 	def key_columns_to_csv(self, filename: str = None, drop_nan: bool = True) -> None:
 		"""
@@ -324,30 +325,55 @@ class PublicationsDataBunch(DataBunch):
 	@classmethod
 	def _merge_links(cls, df: pd.DataFrame, links: List[str]) -> pd.DataFrame:
 
-		# for storing relevant links and their corresponding year below
-		affiliations_links, affiliations_years = [], []
-
-		# every link...
-		for l in links:
-
-			# ...that matches the pattern for an "affiliations file"...
-			if m := cls.re_year_in_author_affiliations.match(l):
-
-				# ...is stored...
-				affiliations_links.append(l)
-
-				# ...along with its corresponding year
-				affiliations_years.append(m.group(1))
+		# # for storing relevant links and their corresponding year below
+		# affiliations_links, affiliations_years = [], []
+		#
+		# # every link...
+		# for l in links:
+		#
+		# 	# ...that matches the pattern for an "affiliations file"...
+		# 	if m := cls.re_year_in_author_affiliations.match(l):
+		#
+		# 		# ...is stored...
+		# 		affiliations_links.append(l)
+		#
+		# 		# ...along with its corresponding year
+		# 		affiliations_years.append(m.group(1))
 
 		# links for CSV's and XML's are added to the `DataFrame`
 		cls._matching_year_merge_links(
 			df, links, cls.year_in_project_file_name_pattern, r'_(PUB|AFFLNK)_([CX])_(\d{4}).zip', r'PUB')
 
-		# a new column for "affiliations" is added to the `DataFrame`
-		df['Author Affiliations'] = np.nan
+		# # a new column for "affiliations" is added to the `DataFrame`
+		# df['Author Affiliations'] = np.nan
+		#
+		# # it is only filled in at the appropriate rows
+		# df.loc[affiliations_years, 'Author Affiliations'] = affiliations_links
 
-		# it is only filled in at the appropriate rows
-		df.loc[affiliations_years, 'Author Affiliations'] = affiliations_links
+		return df
+
+
+class PublicationsAuthorAffiliationsDataBunch(DataBunch):
+
+	@staticmethod
+	def post_process(df: pd.DataFrame) -> pd.DataFrame:
+
+		df['AUTH_TRANS_ID'] = df['AUTH_TRANS_ID'].astype(pd.StringDtype())
+
+		return df
+
+	@classmethod
+	def _merge_links(cls, df: pd.DataFrame, links: List[str]) -> pd.DataFrame:
+
+		cls._matching_year_merge_links(
+			df, links, PublicationsDataBunch.year_in_project_file_name_pattern,
+			r'.*_(AFFLNK)_(C)_(\d{4})\.zip$', r'AFFLNK')
+
+		# rows that have nothing to download must be dropped
+		df.drop(df[df['CSV_link'].isna()].index, inplace=True)
+
+		# this size doesn't correspond to the authors' affiliations file (but to the associated publications one)
+		df['CSV'] = ''
 
 		return df
 

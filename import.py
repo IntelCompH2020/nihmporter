@@ -16,12 +16,14 @@ with open('parameters.yaml') as yaml_data:
 
 projects = nih.ProjectsDataBunch({**parameters['common'], **parameters['projects']})
 publications = nih.PublicationsDataBunch({**parameters['common'], **parameters['publications']})
+publications_author_affiliations = nih.PublicationsAuthorAffiliationsDataBunch(
+	{**parameters['common'], **parameters['publications author affiliations']})
 links = nih.LinksDataBunch({**parameters['common'], **parameters['link tables']})
 patents = nih.PatentsDataBunch({**parameters['common'], **parameters['patents']})
 abstracts = nih.AbstractsDataBunch({**parameters['common'], **parameters['abstracts']})
 
 # for each one of the above "data bunch"s...
-for data_bunch in [projects, publications, links, patents, abstracts]:
+for data_bunch in [projects, publications, publications_author_affiliations, links, patents, abstracts]:
 
 	# ...data is actually downloaded (if necessary)
 	data_bunch.get()
