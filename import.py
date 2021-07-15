@@ -21,9 +21,11 @@ publications_author_affiliations = nih.PublicationsAuthorAffiliationsDataBunch(
 links = nih.LinksDataBunch({**parameters['common'], **parameters['link tables']})
 patents = nih.PatentsDataBunch({**parameters['common'], **parameters['patents']})
 abstracts = nih.AbstractsDataBunch({**parameters['common'], **parameters['abstracts']})
+clinical_studies = nih.ClinicalStudiesDataBunch({**parameters['common'], **parameters['clinical studies']})
 
 # for each one of the above "data bunch"s...
-for data_bunch in [projects, publications, publications_author_affiliations, links, patents, abstracts]:
+for data_bunch in [
+	projects, publications, publications_author_affiliations, links, patents, abstracts, clinical_studies]:
 
 	# ...data is actually downloaded (if necessary)
 	data_bunch.get()

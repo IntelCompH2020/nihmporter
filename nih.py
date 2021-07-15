@@ -325,30 +325,9 @@ class PublicationsDataBunch(DataBunch):
 	@classmethod
 	def _merge_links(cls, df: pd.DataFrame, links: List[str]) -> pd.DataFrame:
 
-		# # for storing relevant links and their corresponding year below
-		# affiliations_links, affiliations_years = [], []
-		#
-		# # every link...
-		# for l in links:
-		#
-		# 	# ...that matches the pattern for an "affiliations file"...
-		# 	if m := cls.re_year_in_author_affiliations.match(l):
-		#
-		# 		# ...is stored...
-		# 		affiliations_links.append(l)
-		#
-		# 		# ...along with its corresponding year
-		# 		affiliations_years.append(m.group(1))
-
 		# links for CSV's and XML's are added to the `DataFrame`
 		cls._matching_year_merge_links(
 			df, links, cls.year_in_project_file_name_pattern, r'_(PUB|AFFLNK)_([CX])_(\d{4}).zip', r'PUB')
-
-		# # a new column for "affiliations" is added to the `DataFrame`
-		# df['Author Affiliations'] = np.nan
-		#
-		# # it is only filled in at the appropriate rows
-		# df.loc[affiliations_years, 'Author Affiliations'] = affiliations_links
 
 		return df
 
@@ -415,3 +394,14 @@ class LinksDataBunch(DataBunch):
 
 		return cls._matching_year_merge_links(
 			df, links, cls.year_in_project_file_name_pattern, r'_(PUBLNK)_([CX])_(\d{4}).zip', r'PUBLNK')
+
+
+class ClinicalStudiesDataBunch(DataBunch):
+
+	@classmethod
+	def _merge_links(cls, df: pd.DataFrame, links: List[str]) -> pd.DataFrame:
+
+		# links are copied to the column expected by methods further down the line
+		df['CSV_link'] = links
+
+		return df

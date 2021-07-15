@@ -170,3 +170,18 @@ abstracts:
 
   data types:
 
+# =======================================================================
+
+clinical studies:
+
+  name: clinical_studies
+
+  relative path: "ExPORTER_Catalog.aspx?sid=2&index=4"
+
+  table number: *nih_projects_table_number
+
+  filename patterns to be ignored: []
+
+  key columns: [ClinicalTrials.gov ID, Core Project Number]
+
+  data types:
