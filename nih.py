@@ -213,7 +213,7 @@ class DataBunch:
 
 		return df
 
-	def get(self) -> pd.DataFrame:
+	def get(self, ignore_existing: bool = True) -> pd.DataFrame:
 		"""
 		Gets the data associated to this `DataBunch`.
 
@@ -221,11 +221,14 @@ class DataBunch:
 		-------
 		out: dataframe
 			Requested data.
+		ignore_existing: bool, optional
+			If `True` (default), the returned `DataFrame` is always built from the downloaded files. If `False`, one
+			should make sure that the returned `DataFrame` was built from up-to-date downloaded files.
 
 		"""
 
 		# if a previous "binary output" file is not found...
-		if not self.binary_output_file.exists():
+		if ignore_existing or (not self.binary_output_file.exists()):
 
 			# the appointed table at the given URL is parsed into a `DataFrame`
 			html_table_df = self.parse_html_table()

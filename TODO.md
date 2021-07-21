@@ -1,0 +1,4 @@
+- nih
+    - DataBunch
+        - get
+            - check whether a saved `DataFrame` is *in sync* with the downloaded files (instead of, by default, always rebuilding it)
