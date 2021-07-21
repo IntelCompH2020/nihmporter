@@ -81,6 +81,9 @@ class DataBunch:
 		# the only element in the list above is selected
 		df = table_of_interest_dfs[0]
 
+		# the "update" dates are parsed into `datetime`s
+		df['Last Updated Date'] = pd.to_datetime(df['Last Updated Date'])
+
 		# a numpy array with either links or "no link"s
 		links = [np.where(tag.has_attr('href'), tag.get('href'), 'no link') for tag in table_of_interest.find_all('a')]
 
@@ -235,8 +238,8 @@ class DataBunch:
 
 			# CSV links specified in the `DataFrame` are downloaded and uncompressed
 			_, uncompressed_files = download.files_list(
-				html_table_df['CSV_link'], downloads_directory, self.nih_homepage, html_table_df['CSV'],
-				unzip_to=unzipped_files_directory)
+				html_table_df['CSV_link'], downloads_directory, self.nih_homepage, html_table_df['Last Updated Date'],
+				html_table_df['CSV'], unzip_to=unzipped_files_directory)
 
 			# a single `DataFrame` is built from all the CSV files...
 			csv_df = util.dataframe_from_csv_files(uncompressed_files, self.parameters['data types'])

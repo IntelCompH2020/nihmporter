@@ -1,8 +1,12 @@
 import pathlib
+
+import pandas as pd
 import requests
 import zipfile
 import urllib.parse
 from typing import Union, Optional, Collection, List, Tuple
+
+import util
 
 current_dir = pathlib.Path.cwd()
 
@@ -32,7 +36,7 @@ def file(url: str, output_file: Union[str, pathlib.Path]) -> None:
 
 def files_list(
 		files_relative_paths: Collection[str], downloads_directory: Union[str, pathlib.Path], homepage: str,
-		sizes: Optional[Collection[str]] = None,
+		last_update_dates: Collection[pd.Timestamp], sizes: Optional[Collection[str]] = None,
 		unzip_to: Optional[str] = None) -> Union[Tuple[List[pathlib.Path], List[pathlib.Path]], List[pathlib.Path]]:
 	"""
 	Downloads the URLs.
@@ -45,6 +49,8 @@ def files_list(
 		Directory where the files will be downloaded.
 	homepage: str
 		Base URL with respect to which the `relative_paths` are specified.
+	last_update_dates: iterable over `pd.Timestamps`
+		Date a file was last updated in the server.
 	sizes: iterable over str, optional
 		Sizes of the files.
 	unzip_to: str, optional
@@ -58,6 +64,9 @@ def files_list(
 		The paths of the uncompressed files *if* `unzip_to` was passed.
 
 	"""
+
+	# as many dates as files
+	assert len(files_relative_paths) == len(last_update_dates)
 
 	# if a `Collection` of sizes was passed...
 	if sizes is not None:
@@ -87,7 +96,7 @@ def files_list(
 		unzipped_files = []
 
 	# for every file along with its size...
-	for f, size in zip(files_relative_paths, sizes):
+	for f, size, last_update in zip(files_relative_paths, sizes, last_update_dates):
 
 		output_file = output_dir / pathlib.Path(f).name
 
@@ -105,7 +114,18 @@ def files_list(
 
 		else:
 
-			print(f'found "{output_file.relative_to(current_dir)}" {size}')
+			modification_date = util.modification_date_from_path(output_file)
+
+			# if the file in the server was updated *after* the (modification) date recorded in the downloaded file...
+			if last_update > modification_date:
+
+				print(f'updating "{output_file.relative_to(current_dir)}" {size}')
+
+				file(urllib.parse.urljoin(homepage, f), output_file)
+
+			else:
+
+				print(f'found up-to-date "{output_file.relative_to(current_dir)}" {size}')
 
 		# if a directory to unzip the files to was passed...
 		if unzip_to is not None:

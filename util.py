@@ -74,3 +74,11 @@ def dataframe_types_to_yaml(df: pd.DataFrame) -> str:
 	"""
 
 	return yaml.dump(df.dtypes.apply(lambda x: x.name).to_dict())
+
+
+def modification_date_from_path(f: Union[str, pathlib.Path]) -> pd.Timestamp:
+
+	# in case a `str` was passed
+	f = pathlib.Path(f)
+
+	return pd.Timestamp.fromtimestamp(f.stat().st_mtime)
