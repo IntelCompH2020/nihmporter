@@ -39,6 +39,18 @@ class DataBunch:
 		# to act as cache
 		self.df: Optional[pd.DataFrame] = None
 
+		# the directory in which to save the CSV files
+		self.csv_files_directory = pathlib.Path(parameters['output']['csv']['directory'])
+
+		# within the latter, the *sub*directory in which to save only the key columns of each table
+		self.csv_files_key_columns_directory = self.csv_files_directory / parameters['output']['csv'][
+			'key columns subdirectory']
+
+		# it it doesn't exist...
+		if not self.csv_files_key_columns_directory.exists():
+			# ...it is created (notice that this also creates the parent if needed)
+			self.csv_files_key_columns_directory.mkdir(parents=True, exist_ok=True)
+
 	def load_df(self) -> pd.DataFrame:
 
 		return pd.read_feather(self.binary_output_file)
@@ -292,7 +304,8 @@ class DataBunch:
 		if not filename:
 
 			# ...the default one is used
-			filename = self.binary_output_file.with_suffix('.csv')
+			# filename = self.binary_output_file.with_suffix('.csv')
+			filename = (self.csv_files_key_columns_directory / self.binary_output_file.name).with_suffix('.csv')
 
 		to_csv_parameters = dict(path_or_buf=filename, header=True, index=False)
 
@@ -303,6 +316,28 @@ class DataBunch:
 		else:
 
 			self.df[self.key_columns].drop_duplicates().to_csv(**to_csv_parameters)
+
+	def to_csv(self, filename: str = None) -> None:
+		"""
+		Exports to a CSV file.
+
+		Parameters
+		----------
+		filename: str, optional
+			Output file name.
+
+		"""
+
+		# if a file name was not provided...
+		if not filename:
+
+			# ...the default one is used
+			filename = (self.csv_files_directory / self.binary_output_file.name).with_suffix('.csv')
+
+		to_csv_parameters = dict(path_or_buf=filename, header=True, index=False)
+
+		# self.drop_duplicates().to_csv(**to_csv_parameters)
+		self.df.to_csv(**to_csv_parameters)
 
 
 class ProjectsDataBunch(DataBunch):

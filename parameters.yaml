@@ -12,6 +12,18 @@ common:
 
     dataframes directory: *output_downloads_directory
 
+    # Comma Separated Value format
+    csv:
+
+      # directory in which to save CSV files
+      directory: downloads/csv
+
+      # subdirectory of the one above in which to store CSV files with only the "key" columns
+      key columns subdirectory: key_columns
+
+      # besides the appointed binary format, every `DataFrame` is also saved in a CSV file
+      save everything: true
+
 projects:
 
   # to be used in naming

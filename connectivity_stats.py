@@ -15,10 +15,13 @@ with open('parameters.yaml') as yaml_data:
 
 # ---
 
-projects_csv_file = pathlib.Path(parameters['projects']['name'] + '.csv')
-publications_csv_file = pathlib.Path(parameters['publications']['name'] + '.csv')
-link_csv_file = pathlib.Path(parameters['link tables']['name'] + '.csv')
-patents_csv_file = pathlib.Path(parameters['patents']['name'] + '.csv')
+input_directory = pathlib.Path(parameters['common']['output']['csv']['directory']) / parameters[
+	'common']['output']['csv']['key columns subdirectory']
+
+projects_csv_file = input_directory / (parameters['projects']['name'] + '.csv')
+publications_csv_file = input_directory / (parameters['publications']['name'] + '.csv')
+link_csv_file = input_directory / (parameters['link tables']['name'] + '.csv')
+patents_csv_file = input_directory / (parameters['patents']['name'] + '.csv')
 
 for file in [projects_csv_file, publications_csv_file, link_csv_file]:
 
