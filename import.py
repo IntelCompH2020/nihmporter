@@ -42,6 +42,3 @@ for data_bunch in [
 
 	# in order to avoid "out of memory" errors
 	del data_bunch.df
-
-# grouped_projects = projects.df.groupby('CORE_PROJECT_NUM')
-# grouped_projects.get_group('ZIJAR041172')
