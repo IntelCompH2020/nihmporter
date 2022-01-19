@@ -95,7 +95,7 @@ def files_list(
 		# ...a list for uncompressed files is initialized
 		unzipped_files = []
 
-	# for every file along with its size...
+	# for every file, along with its size and last update date...
 	for f, size, last_update in zip(files_relative_paths, sizes, last_update_dates):
 
 		output_file = output_dir / pathlib.Path(f).name
@@ -121,8 +121,10 @@ def files_list(
 
 				print(f'updating "{output_file.relative_to(current_dir)}" {size}')
 
+				# ...it must be re-downloaded
 				file(urllib.parse.urljoin(homepage, f), output_file)
 
+			# if the file in the server was updated *before* the (modification) date recorded in the downloaded file...
 			else:
 
 				print(f'found up-to-date "{output_file.relative_to(current_dir)}" {size}')

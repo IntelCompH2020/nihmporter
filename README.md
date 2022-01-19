@@ -13,7 +13,7 @@ Activate the above environment and run
 ./import.py
 ```
 
-It should result in some [*feather*](https://arrow.apache.org/docs/python/feather.html)/*pickle* (as of July 2021, huge feather files cause memory issues) files, each one storing a [Pandas](https://pandas.pydata.org/) dataframe.
+It should result in some [*feather*](https://arrow.apache.org/docs/python/feather.html)/*pickle* (as of July 2021, huge feather files cause memory issues) files, each one storing a [Pandas](https://pandas.pydata.org/) `DataFrame`. In any one of them, the same *record* might (most likely will) show up more than once since, until its final release, the information of a contract is updated in different files (which `import.py` *stitches* together) at successive dates. For more details see the [About section](https://exporter.nih.gov/about.aspx).
 
 The script also produces a bunch of *csv* files which subset the above *feather*/*pickle* files into some data exploited by the (extra) utiliy `connectivity_stats.py`.
 
