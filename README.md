@@ -21,3 +21,5 @@ The script also produces a bunch of *csv* files which subset the above *feather*
 ## Re-runs
 
 If the script is re-run (in the same directory), many already existing files will be reused (i.e., **not** downloaded again). In particular, whenever the program is about to download some *zip* file, it will only do so if it is not already present, or if the homonymous file in the server is more recent (in which case the local file will be overwritten).
+
+![This project has received funding from the European Union’s Horizon 2020 research and innovation programme under grant agreement No. 101004870. H2020-SC6-GOVERNANCE-2018-2019-2020 / H2020-SC6-GOVERNANCE-2020](https://github.com/IntelCompH2020/.github/blob/main/profile/banner.png)
